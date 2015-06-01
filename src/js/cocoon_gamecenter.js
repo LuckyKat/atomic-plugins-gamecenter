@@ -36,7 +36,7 @@
 
             /**
              * Returns a Cocoon Social Interface for the Game Center Extension.
-             * You can use the Game Center extension in two ways, with 1:1 official API equivalent or with the CocoonJS API abstraction.
+             * You can use the Game Center extension in two ways, with 1:1 official API equivalent or with the Cocoon API abstraction.
              * @function getSocialInterface
              * @memberOf Cocoon.Social.GameCenter
              * @see Cocoon.Social.Interface
