@@ -72,6 +72,21 @@ The following JavaScript file is included automatically:
 	        	console.error("submitAchievement error: " + error.message);
 		});
 
+		social.showAchievements(function(error){
+	    	if (error)
+	        	console.error("showAchievements error: " + error.message);
+		});
+
+		social.submitScore( score, function(error){
+    		if (error)
+        		console.error("submitScore error: " + error.message);
+		});
+
+		social.showLeaderboard(function(error){
+   			if (error)
+     			console.error("showLeaderbord error: " + error.message);
+		});
+
 	    social.logout();
 	}
 
