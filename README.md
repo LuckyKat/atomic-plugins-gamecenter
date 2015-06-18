@@ -33,7 +33,7 @@ Releases are deployed to Cordova Plugin Registry. You only have to install the d
 
     cordova plugin add com.ludei.social.ios.gamecenter;
 
-The following JavaScript file is included automatically:
+The following JavaScript files are included automatically:
 
 [`cocoon_social.js`](https://github.com/ludei/atomic-plugins-social/blob/master/src/js/cocoon_social.js)
 [`cocoon_gamecenter.js`](src/js/cocoon_gamecenter.js)
