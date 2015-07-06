@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.ludei.social.ios.gamecenter" version="1.0.2">
+        id="com.ludei.social.ios.gamecenter" version="1.0.3">
     <name>CocoonGameCenter</name>
     <description>iOS Game Center API</description>
     <license>MPL 2.0</license>
     <keywords>cordova,Social,GameCenter,game,center,achievements,leaderboards,cocoon</keywords>
+    <repo>https://github.com/ludei/atomic-plugins-gamecenter</repo>
     <platform name="ios">
         <header-file src="src/LDGameCenterPlugin.h" />
         <source-file src="src/LDGameCenterPlugin.m" />
