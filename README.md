@@ -31,7 +31,7 @@ Cocoon.Social.GameCenter class provides an easy to use social interface for Game
 
 Releases are deployed to Cordova Plugin Registry. You only have to install the desired plugins using Cordova CLI, CocoonJS CLI or Ludei's Cocoon.io Cloud Server.
 
-    cordova plugin add com.ludei.social.ios.gamecenter;
+    cordova plugin add cocoon-plugin-social-ios-gamecenter;
 
 The following JavaScript files are included automatically:
 

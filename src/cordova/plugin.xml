@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.ludei.social.ios.gamecenter" version="1.0.3">
+        id="cocoon-plugin-social-ios-gamecenter" version="1.0.0">
     <name>CocoonGameCenter</name>
     <description>iOS Game Center API</description>
     <license>MPL 2.0</license>
@@ -23,5 +23,5 @@
         </js-module>
 
     </platform>
-    <dependency id="com.ludei.social.common" />
+    <dependency id="cocoon-plugin-social-common" />
 </plugin>
