@@ -4,53 +4,53 @@
 static NSDictionary * fromGKPlayer(GKPlayer * gkPlayer)
 {
     return @{
-        @"playerID": gkPlayer.playerID,
-        @"alias": gkPlayer.alias,
-        @"isFriend": [NSNumber numberWithBool:gkPlayer.isFriend]
-    };
+             @"playerID": gkPlayer.playerID,
+             @"alias": gkPlayer.alias,
+             @"isFriend": [NSNumber numberWithBool:gkPlayer.isFriend]
+             };
 }
 
 static NSDictionary * fromGKLocalPlayer(GKLocalPlayer * gkPlayer)
 {
     return @{
-        @"playerID": gkPlayer.playerID ?: @"",
-        @"alias": gkPlayer.alias ?: @"",
-        @"isFriend": [NSNumber numberWithBool:gkPlayer.isFriend],
-        @"isAuthenticated": [NSNumber numberWithBool:gkPlayer.isAuthenticated],
-        @"underage": [NSNumber numberWithBool:gkPlayer.underage],
-    };
+             @"playerID": gkPlayer.playerID ?: @"",
+             @"alias": gkPlayer.alias ?: @"",
+             @"isFriend": [NSNumber numberWithBool:gkPlayer.isFriend],
+             @"isAuthenticated": [NSNumber numberWithBool:gkPlayer.isAuthenticated],
+             @"underage": [NSNumber numberWithBool:gkPlayer.underage],
+             };
 }
 
 static NSDictionary * fromGKAchievement(GKAchievement * ach)
 {
     return @{
-        @"identifier": ach.identifier,
-        @"percentComplete": [NSNumber numberWithDouble:ach.percentComplete],
-        @"lastReportedDate": [NSNumber numberWithDouble:ach.lastReportedDate.timeIntervalSince1970]
-    };
+             @"identifier": ach.identifier,
+             @"percentComplete": [NSNumber numberWithDouble:ach.percentComplete],
+             @"lastReportedDate": [NSNumber numberWithDouble:ach.lastReportedDate.timeIntervalSince1970]
+             };
 }
 
 static NSDictionary * fromGKAchievementDescription(GKAchievementDescription * ach)
 {
     return @{
-        @"identifier": ach.identifier,
-        @"title": ach.title,
-        @"maximumPoints": [NSNumber numberWithInteger:ach.maximumPoints],
-        @"achievedDescription": ach.achievedDescription,
-        @"unachievedDescription": ach.unachievedDescription,
-    };
+             @"identifier": ach.identifier,
+             @"title": ach.title,
+             @"maximumPoints": [NSNumber numberWithInteger:ach.maximumPoints],
+             @"achievedDescription": ach.achievedDescription,
+             @"unachievedDescription": ach.unachievedDescription,
+             };
 }
 
 static NSDictionary * fromGKScore(GKScore * score)
 {
     return @{
-        @"value":[NSNumber numberWithDouble:score.value],
-        @"date": [NSNumber numberWithDouble:score.date.timeIntervalSinceReferenceDate],
-        @"rank": [NSNumber numberWithInteger:score.rank],
-        @"category": score.category,
-        @"formattedValue": score.formattedValue,
-        @"playerID": score.playerID
-    };
+             @"value":[NSNumber numberWithDouble:score.value],
+             @"date": [NSNumber numberWithDouble:score.date.timeIntervalSinceReferenceDate],
+             @"rank": [NSNumber numberWithInteger:score.rank],
+             @"category": score.category,
+             @"formattedValue": score.formattedValue,
+             @"playerID": score.playerID
+             };
 }
 
 
@@ -105,7 +105,7 @@ static GKLeaderboard * toLeaderboard(NSDictionary * dic)
     if (rangeStart && rangeLength) {
         result.range = NSMakeRange(rangeStart.unsignedIntegerValue, rangeLength.unsignedIntegerValue);
     }
-
+    
     if (playerScope  && playerScope.integerValue > 0) {
         result.playerScope = GKLeaderboardPlayerScopeFriendsOnly;
     }
@@ -168,6 +168,7 @@ static NSDictionary * toError(NSString * message)
     NSString * _showLeaderboardCallbackId;
     NSString * _showAchievementsCallbackId;
     NSString * _listenerCallbackId;
+    CDVInvokedUrlCommand * loginCallback;
     
 }
 
@@ -184,6 +185,11 @@ static NSDictionary * toError(NSString * message)
         [[NSNotificationCenter defaultCenter] removeObserver:_notificationObserver];
         _notificationObserver = nil;
     }
+    
+    if ([GKLocalPlayer.localPlayer respondsToSelector:@selector(setAuthenticateHandler:)]) {
+        [GKLocalPlayer.localPlayer setAuthenticateHandler:nil];
+    }
+    loginCallback = nil;
 }
 
 -(void) setListener:(CDVInvokedUrlCommand*) command
@@ -211,16 +217,40 @@ static NSDictionary * toError(NSString * message)
     }
     else
     {
-        [[GKLocalPlayer localPlayer] authenticateWithCompletionHandler:^(NSError *error) {
-            
-            NSMutableArray * array = [NSMutableArray array];
-            [array addObject:fromGKLocalPlayer([GKLocalPlayer localPlayer])];
-            if (error) {
-                [array addObject:errorToDic(error)];
-            }
-            CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsArray:array];
-            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-        }];
+        if ([GKLocalPlayer.localPlayer respondsToSelector:@selector(setAuthenticateHandler:)]) {
+            loginCallback = command;
+            [[GKLocalPlayer localPlayer] setAuthenticateHandler:^(UIViewController * vc, NSError * error) {
+                
+                if (vc) {
+                    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+                    [self.viewController presentViewController:vc animated:YES completion:nil];
+                }
+                else if (loginCallback) {
+                    NSMutableArray * array = [NSMutableArray array];
+                    [array addObject:fromGKLocalPlayer([GKLocalPlayer localPlayer])];
+                    if (error) {
+                        [array addObject:errorToDic(error)];
+                    }
+                    CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsArray:array];
+                    [self.commandDelegate sendPluginResult:result callbackId:loginCallback.callbackId];
+                    loginCallback = nil;
+                }
+                
+            }];
+        }
+        else {
+            //iOS 6.0
+            [[GKLocalPlayer localPlayer] authenticateWithCompletionHandler:^(NSError *error) {
+                
+                NSMutableArray * array = [NSMutableArray array];
+                [array addObject:fromGKLocalPlayer([GKLocalPlayer localPlayer])];
+                if (error) {
+                    [array addObject:errorToDic(error)];
+                }
+                CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsArray:array];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            }];
+        }
     }
 }
 
@@ -246,7 +276,7 @@ static NSDictionary * toError(NSString * message)
         }
         
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-
+        
     }];
 }
 
@@ -329,7 +359,7 @@ static NSDictionary * toError(NSString * message)
         }
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
-
+    
 }
 
 
@@ -352,7 +382,7 @@ static NSDictionary * toError(NSString * message)
     {
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:toError(exception.reason)] callbackId:command.callbackId];
     }
-
+    
 }
 
 -(void) submitScore:(CDVInvokedUrlCommand*) command
