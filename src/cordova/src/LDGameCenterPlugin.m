@@ -186,8 +186,11 @@ static NSDictionary * toError(NSString * message)
         _notificationObserver = nil;
     }
     
+    //reset handler
     if ([GKLocalPlayer.localPlayer respondsToSelector:@selector(setAuthenticateHandler:)]) {
-        [GKLocalPlayer.localPlayer setAuthenticateHandler:nil];
+        [GKLocalPlayer.localPlayer setAuthenticateHandler:^(UIViewController * vc, NSError * error) {
+            
+        }];
     }
     loginCallback = nil;
 }

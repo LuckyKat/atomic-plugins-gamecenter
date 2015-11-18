@@ -30,7 +30,7 @@
                 var me = this;
                 Cocoon.exec(this.serviceName, "setListener", [], function(player) {
                     me._currentPlayer = player;
-                    me.onGameCenterLoginStateChanged.emit("loginStatusChanged", [player]);
+                    me.onGameCenterLoginStateChanged.emit("loginStatusChanged", null, [player]);
                 });
             },
 
@@ -434,7 +434,7 @@
             this.gc = gcExtension;
             var me = this;
             this.gc.on("loginStatusChanged", function(localPlayer, error) {
-                me.onLoginStatusChanged.emit("loginStatusChanged", [localPlayer && localPlayer.isAuthenticated, error]);
+                me.onLoginStatusChanged.emit("loginStatusChanged", null, [localPlayer && localPlayer.isAuthenticated, error]);
             });
         };
 

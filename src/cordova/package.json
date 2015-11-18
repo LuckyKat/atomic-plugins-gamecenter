@@ -1,6 +1,6 @@
 {
   "name": "cocoon-plugin-social-ios-gamecenter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "iOS Game Center API",
   "cordova": {
     "id": "cocoon-plugin-social-ios-gamecenter",
