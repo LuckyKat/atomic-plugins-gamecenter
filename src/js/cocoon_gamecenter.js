@@ -6,35 +6,6 @@
     var Cocoon = window.Cocoon;
 
     /**
-    * @fileOverview
-    <h2>About Atomic Plugins</h2>
-    <p>Atomic Plugins provide an elegant and minimalist API and are designed with portability in mind from the beginning. Framework dependencies are avoided by design so the plugins can run on any platform and can be integrated with any app framework or game engine.
-    <br/><p>You can contribute and help to create more awesome plugins. </p>
-    <h2>Atomic Plugin for Game Center</h2>
-    <p>This repo contains Game Center APIs designed using the Atomic Plugins paradigm. Connect your app to Game Center and take advantage of all the features provided. The API is already available in many languagues and we have the plan to add more in the future.</p>
-    <h3>Setup your project</h3>
-    <p>Releases are deployed to NPM. 
-    You only have to install the desired plugins using Cordova CLI and <a href="https://cocoon.io"/>Cocoon Cloud service</a>.</p>
-    <ul>
-    <code>
-    cordova plugin add cocoon-plugin-social-ios-gamecenter;<br/>
-    </code>
-    </ul>
-    <p>The following JavaScript files will be included in your html project by default during installation:</p>
-    <ul>
-    <li><a href="https://github.com/ludei/atomic-plugins-gamecenter/blob/master/src/js/cocoon_gamecenter.js">cocoon_gamecenter.js</a></li>
-    </ul>
-    <h3>Documentation</h3>
-    <p>In this section you will find all the documentation you need for using this plugin in your Cordova project. 
-    Select the specific namespace below to open the relevant documentation section:</p>
-    <ul>
-    <li><a href="http://ludei.github.io/cocoon-common/dist/doc/js/Cocoon.html">Cocoon</a></li>
-    <li><a href="Cocoon.Social.GameCenter.html">GameCenter</a></li>
-    </ul>
-    * @version 1.0
-    */
-
-    /**
      * Cocoon Social Interface for the Game Center Extension.
      * @namespace Cocoon.Social.GameCenter
      */
