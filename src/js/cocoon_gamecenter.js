@@ -272,6 +272,36 @@
                 }, function(error) {
                     callback(error);
                 });
+            },
+
+            /**
+             * Loads a Saved Game from the cloud
+             * @memberof Cocoon.Social.GameCenter
+             * @function loadSavedGame
+             * @param {String} identifier - id for saved game
+             * @param {Function} callback - The callback function. It receives the following parameters:
+             * - SavedGame: Object with the deviceName, modificationDate and identifier. The data property contains the raw bytes converted to string.
+             * @param {Function} error - Error callback, will be called if no saved game was found
+             */
+            loadSavedGame: function(identifier, callback, errorCallback) {
+                Cocoon.exec(this.serviceName, "loadSavedGame", [identifier], callback, function (error) {
+                    errorCallback(error);
+                });
+            },
+
+            /**
+             * Writes a Saved Game to the cloud
+             * @memberof Cocoon.Social.GameCenter
+             * @function writeSavedGame
+             * @param {Object} identifier - id for saved game
+             * @param {Object} data - string representing the raw data 
+             * @param {Function} callback - The callback function.
+             * @param {Function} errorCallback - Error callback.
+             */
+            writeSavedGame: function(identifier, data, callback, errorCallback) {
+                Cocoon.exec(this.serviceName, "writeSavedGame", [identifier, data], callback, function (error) {
+                    errorCallback(error);
+                });
             }
         };
 

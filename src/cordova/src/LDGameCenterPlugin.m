@@ -475,6 +475,105 @@ static NSDictionary * toError(NSString * message)
     _showAchievementsCallbackId = nil;
 }
 
+- (void)loadSavedGame:(CDVInvokedUrlCommand*) command
+{
+    NSString * mySaveName = [command argumentAtIndex:0];
+    GKLocalPlayer* localPlayer = [GKLocalPlayer localPlayer];
+    if (!localPlayer.isAuthenticated) {
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:toError(@"Not logged in")] callbackId:command.callbackId];
+        return;
+    }
+    
+    // - (void)fetchSavedGamesWithCompletionHandler:(void (^)(NSArray<GKSavedGame *> *savedGames, NSError *error))handler;
+    [localPlayer fetchSavedGamesWithCompletionHandler:^(NSArray<GKSavedGame *> *savedGames ,NSError *error) {
+        
+         if(error != nil) {
+             NSLog(@"No save found %@" , error);
+             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:errorToDic(error)] callbackId:command.callbackId];
+             return ;
+         }
+         
+         int saveCount = (int)( (unsigned long) [savedGames count]);
+         NSUInteger saveIndex = -1;
+         for(NSUInteger i = 0; i< saveCount; i++) {
+             NSString *saveName = savedGames[i].name;
+             
+             NSLog(@" the save is : %@" , saveName );
+             
+             if( [saveName isEqualToString:mySaveName])
+             {
+                 saveIndex = i;
+             }
+         }
+         
+         if (saveIndex != -1) {
+             GKSavedGame *savedGame = savedGames[saveIndex];
+             // save found: load it and pass it back
+             //- (void)loadDataWithCompletionHandler:(void (^)(NSData *data, NSError *error))handler;
+             [savedGame loadDataWithCompletionHandler:^(NSData *data, NSError *error){
+                 if(error != nil) {
+                     NSLog(@"Error loading save %@" , error);
+                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:errorToDic(error)] callbackId:command.callbackId];
+                     return;
+                 }
+                 NSString* str = [NSString stringWithUTF8String:[data bytes]];
+                 
+                 // combine savedGame and string data into json
+                 NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+                 [dateFormatter setDateFormat:@"yyyy/MM/dd hh:mm"];
+                 NSString *currentTime = [dateFormatter stringFromDate:savedGame.modificationDate];
+                 NSDictionary *json = @{
+                    @"deviceName":savedGame.deviceName,
+                    @"modificationDate": currentTime,
+                    @"name": savedGame.name,
+                    @"data": str
+                 };
+                 
+                 CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];
+                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+
+             }];
+         } else {
+             // no save was found
+             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+         }
+     
+    }];
+}
+    
+- (void)writeSavedGame:(CDVInvokedUrlCommand*) command
+{
+    NSString * mySaveName = [command argumentAtIndex:0];
+    NSString * mySaveData = [command argumentAtIndex:1];
+    GKLocalPlayer* localPlayer = [GKLocalPlayer localPlayer];
+    if (!localPlayer.isAuthenticated) {
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:toError(@"Not logged in")] callbackId:command.callbackId];
+        return;
+    }
+    
+    //- (void)saveGameData:(NSData *)data
+    //            withName:(NSString *)name
+    //   completionHandler:(void (^)(GKSavedGame *savedGame, NSError *error))handler;
+    
+    // - (void)fetchSavedGamesWithCompletionHandler:(void (^)(NSArray<GKSavedGame *> *savedGames, NSError *error))handler;
+    //[localPlayer fetchSavedGamesWithCompletionHandler:^(NSArray<GKSavedGame *> *savedGames ,NSError *error) {}
+    
+    // convert string data to NSData
+    NSData *data = [NSData dataWithBytes:[mySaveData UTF8String] length:[mySaveData length]];
+    
+    [localPlayer saveGameData:data withName:mySaveName completionHandler:^(GKSavedGame *savedGame ,NSError *error) {
+        CDVPluginResult * result;
+        if (error) {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:errorToDic(error)];
+        }
+        else {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        }
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+
+}
+    
 #pragma mark GKLeaderboardViewControllerDelegate
 -(void)leaderboardViewControllerDidFinish:(GKLeaderboardViewController *)viewController
 {
