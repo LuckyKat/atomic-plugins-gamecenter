@@ -484,7 +484,6 @@ static NSDictionary * toError(NSString * message)
         return;
     }
     
-    // - (void)fetchSavedGamesWithCompletionHandler:(void (^)(NSArray<GKSavedGame *> *savedGames, NSError *error))handler;
     [localPlayer fetchSavedGamesWithCompletionHandler:^(NSArray<GKSavedGame *> *savedGames ,NSError *error) {
         
          if(error != nil) {
@@ -492,7 +491,7 @@ static NSDictionary * toError(NSString * message)
              [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:errorToDic(error)] callbackId:command.callbackId];
              return ;
          }
-         
+        
          int saveCount = (int)( (unsigned long) [savedGames count]);
          NSUInteger saveIndex = -1;
          for(NSUInteger i = 0; i< saveCount; i++) {
@@ -509,14 +508,15 @@ static NSDictionary * toError(NSString * message)
          if (saveIndex != -1) {
              GKSavedGame *savedGame = savedGames[saveIndex];
              // save found: load it and pass it back
-             //- (void)loadDataWithCompletionHandler:(void (^)(NSData *data, NSError *error))handler;
              [savedGame loadDataWithCompletionHandler:^(NSData *data, NSError *error){
                  if(error != nil) {
                      NSLog(@"Error loading save %@" , error);
                      [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:errorToDic(error)] callbackId:command.callbackId];
                      return;
                  }
-                 NSString* str = [NSString stringWithUTF8String:[data bytes]];
+                 // TODO: I'm not sure how to convert NSData to NSString and back safely, so using ascii data for now
+//                 NSString* str = [NSString stringWithUTF8String:[data bytes]];
+                 NSString *str = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
                  
                  // combine savedGame and string data into json
                  NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
@@ -528,7 +528,6 @@ static NSDictionary * toError(NSString * message)
                     @"name": savedGame.name,
                     @"data": str
                  };
-                 
                  CDVPluginResult * result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];
                  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 
@@ -551,15 +550,9 @@ static NSDictionary * toError(NSString * message)
         return;
     }
     
-    //- (void)saveGameData:(NSData *)data
-    //            withName:(NSString *)name
-    //   completionHandler:(void (^)(GKSavedGame *savedGame, NSError *error))handler;
-    
-    // - (void)fetchSavedGamesWithCompletionHandler:(void (^)(NSArray<GKSavedGame *> *savedGames, NSError *error))handler;
-    //[localPlayer fetchSavedGamesWithCompletionHandler:^(NSArray<GKSavedGame *> *savedGames ,NSError *error) {}
-    
     // convert string data to NSData
-    NSData *data = [NSData dataWithBytes:[mySaveData UTF8String] length:[mySaveData length]];
+//    NSData *data = [NSData dataWithBytes:[mySaveData UTF8String] length:[mySaveData length]];
+    NSData *data = [mySaveData dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:NO];
     
     [localPlayer saveGameData:data withName:mySaveName completionHandler:^(GKSavedGame *savedGame ,NSError *error) {
         CDVPluginResult * result;
